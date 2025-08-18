@@ -53,3 +53,23 @@ body{margin:0;background:radial-gradient(1200px 600px at 15% -10%,#0f1b22 0,#0c1
 .lightbox img{max-width:90vw;max-height:70vh;border-radius:12px;border:1px solid var(--border)}
 .lightbox .caption{margin-top:8px;text-align:center}
 .lightbox-close{position:absolute;top:16px;right:16px;background:var(--panel);border:1px solid var(--border);border-radius:999px;color:var(--ink);font-size:24px;line-height:28px;width:40px;height:40px}
+
+
+/* v32 additions */
+.brand-logo { height: 28px; width: auto; vertical-align: middle; margin-right: 8px; border-radius: 6px; }
+nav .has-submenu { position: relative; }
+nav .submenu {
+  display: none;
+  position: absolute;
+  top: 100%; left: 0;
+  background: rgba(18,18,18,0.95);
+  border: 1px solid rgba(255,255,255,0.08);
+  padding: 0.5rem 0;
+  border-radius: 0.5rem;
+  min-width: 160px;
+  z-index: 20;
+}
+nav .has-submenu:hover .submenu { display: block; }
+nav .submenu li { list-style: none; }
+nav .submenu a { display: block; padding: 0.4rem 0.8rem; text-decoration: none; }
+.footer-links a { text-decoration: none; }

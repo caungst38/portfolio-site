@@ -10,7 +10,7 @@
   <script defer src="app.js?v=7.0"></script>
 </head>
 <body>
-<header class="topbar">
+<header class="topbar"><img src="assets/images/logo-ca.webp" class="brand-logo" alt="Logo" />
   <div class="brand">
     <img src="assets/images/logo/ca.webp" alt="CA Logo" class="logo"/>
     <div class="name"><span class="brand-name no-wrap">Connyr Aungst</span><small>Cybersecurity • IT</small></div>
@@ -29,7 +29,10 @@
     <p class="muted">Blue‑team & red‑team labs, projects, and notes.</p>
     <picture>
       <source type="image/webp" srcset="assets/images/headshot.webp" />
-      <img src="assets/images/headshot.jpg" alt="Connyr Aungst headshot" class="hero-headshot hero-lg" />
+      <picture>
+  <source srcset="assets/images/headshot.webp" type="image/webp">
+  <img class="hero-headshot hero-lg" src="assets/images/headshot.jpg" alt="Connyr Aungst headshot">
+</picture>
     </picture>
   </section>
 
@@ -74,7 +77,7 @@
 
 <footer class="footer section-center">
   <div class="muted">© <span id="year"></span> Connyr Aungst — <a href="mailto:you@connyraungst.com">you@connyraungst.com</a></div>
-</footer>
+<span class="footer-links"> | <a href="https://www.linkedin.com/in/connyraungst" target="_blank" rel="noopener">LinkedIn</a> · <a href="https://github.com/caungst38" target="_blank" rel="noopener">GitHub</a> · <a href="mailto:you@connyraungst.com">Email</a></span></footer>
 
 <div id="lightbox" class="lightbox" aria-hidden="true">
   <button class="lightbox-close" aria-label="Close">×</button>
