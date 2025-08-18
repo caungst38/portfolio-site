@@ -1,0 +1,12 @@
+﻿# OS/editor
+.DS_Store
+Thumbs.db
+*.log
+
+# Archives & artifacts
+*.zip
+*.tar
+*.tgz
+
+# Netlify local state (safe to keep or ignore)
+.netlify
