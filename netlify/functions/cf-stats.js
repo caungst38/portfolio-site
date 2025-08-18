@@ -1,13 +1,12 @@
 // netlify/functions/cf-stats.js
 // Cloudflare Analytics via GraphQL (REST is sunset)
 
-exports.handler = async () => {
+exports.handler = async (event) => {
+  const DEBUG = event && event.queryStringParameters && event.queryStringParameters.debug === '1';
   const token = process.env.CF_API_TOKEN;
   const zone  = process.env.CF_ZONE_ID;
   if (!token || !zone) {
-    return {
-      statusCode: 200,
-      body: JSON.stringify({ enabled: false, reason: "Missing CF_API_TOKEN or CF_ZONE_ID" })
+    const payload = { enabled: false, reason: "Missing CF_API_TOKEN or CF_ZONE_ID" })
     };
   }
 
@@ -16,16 +15,22 @@ exports.handler = async () => {
     "Content-Type": "application/json",
   };
 
-  const now       = new Date();
-  const since7d   = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000).toISOString();
-  const since24h  = new Date(now.getTime() - 1 * 24 * 60 * 60 * 1000).toISOString();
-  const untilISO  = now.toISOString();
+  const now = new Date();
+  const daysParam = event && event.queryStringParameters && parseInt(event.queryStringParameters.days,10);
+  const days = Number.isFinite(daysParam) && daysParam>0 && daysParam<366 ? daysParam : 7;
+  const since7d = new Date(now.getTime() - days * 24 * 60 * 60 * 1000).toISOString();
+  const since24h = new Date(now.getTime() - 1 * 24 * 60 * 60 * 1000).toISOString();
+  const untilISO = now.toISOString();
 
   const gqlTotals = `
     query($zone:String!, $since:Time!, $until:Time!) {
-      viewer { zones(filter: { zoneTag: $ $zone }) {
-        httpRequests1dGroups(limit: 200, filter: { datetime_geq: $since, datetime_leq: $until }) {
-          sum  { requests }
+      viewer { zones(filter: { zoneTag: $zone }) {
+        httpRequestsAdaptiveGroups(
+          limit: 1000,
+          orderBy: [sum_requests_DESC],
+          filter: { datetime_geq: $since, datetime_leq: $until }
+        ) {
+          sum  { requests bytes }
           uniq { uniques }
         }
       } }
@@ -33,9 +38,9 @@ exports.handler = async () => {
 
   const gqlCountries = `
     query($zone:String!, $since:Time!, $until:Time!) {
-      viewer { zones(filter: { zoneTag: $ $zone }) {
-        httpRequests1dGroups(
-          limit: 200,
+      viewer { zones(filter: { zoneTag: $zone }) {
+        httpRequestsAdaptiveGroups(
+          limit: 50,
           orderBy: [sum_requests_DESC],
           filter: { datetime_geq: $since, datetime_leq: $until }
         ) {
@@ -47,7 +52,7 @@ exports.handler = async () => {
 
   const gqlFirewall = `
     query($zone:String!, $since:Time!, $until:Time!) {
-      viewer { zones(filter: { zoneTag: $ $zone }) {
+      viewer { zones(filter: { zoneTag: $zone }) {
         firewallEventsAdaptive(
           limit: 10000,
           filter: { datetime_geq: $since, datetime_leq: $until }
@@ -101,16 +106,15 @@ exports.handler = async () => {
       };
     } catch {}
 
-    return {
-      statusCode: 200,
-      body: JSON.stringify({
+    const payload = {
         enabled: true,
         pageviews_7d,
         uniques_7d,
         top_countries_24h,
         rate_limited_24h
-      })
-    };
+      };
+    if (DEBUG) { payload.debug = true; }
+    return { statusCode: 200, body: JSON.stringify(payload) };
   } catch (e) {
     return { statusCode: 500, body: JSON.stringify({ enabled: false, error: e.message }) };
   }
