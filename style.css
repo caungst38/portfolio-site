@@ -197,13 +197,18 @@ body{margin:0;background:radial-gradient(1200px 600px at 15% -10%, rgba(22,255,2
 /* Hide any leftover tags key container if present */
 .tags-key, #tags-key, .project-tags-key { display: none !important; }
 
-/* v29 Cloudflare stats UI */
-#cf-stats { max-width: 1100px; margin: 2rem auto; padding: 0 1rem; }
-.stats-cards { display:grid; grid-template-columns: repeat(auto-fit, minmax(180px,1fr)); gap: 1rem; margin-bottom:1rem; }
-.stats-cards .card { padding: 1rem; border-radius: 1rem; box-shadow: 0 6px 20px rgba(0,0,0,0.08); }
-.stats-cards .label { font-size: 0.9rem; opacity: 0.8; }
-.stats-cards .value { font-size: 1.6rem; font-weight: 700; margin-top: 0.25rem; }
-.stats-tables .card { padding: 1rem; border-radius: 1rem; box-shadow: 0 6px 20px rgba(0,0,0,0.08); }
-table.mini { width: 100%; border-collapse: collapse; }
-table.mini th, table.mini td { padding: 0.4rem 0.5rem; border-bottom: 1px solid rgba(0,0,0,0.06); }
-table.mini th.num, table.mini td.num { text-align: right; }
+
+/* v30 cleanup */
+.no-wrap { white-space: nowrap; }
+
+/* Stats pills */
+.pill { padding:4px 10px; border-radius:999px; background:var(--chip); border:1px solid var(--border); display:inline-block; margin:2px; }
+
+/* About split */
+#about { margin: 3rem auto; max-width: 1100px; padding: 0 1rem; }
+.about-split { display:grid; grid-template-columns: 1fr 2fr; gap: 1.25rem; align-items:start; }
+.about-headshot { max-width:260px; width:100%; height:auto; border-radius:0.75rem; display:block; }
+@media (max-width: 800px) { .about-split { grid-template-columns:1fr; } .hero-lg { transform:none; } }
+
+/* Hero image sizing */
+.hero-headshot.hero-lg { display:block; margin:14px auto 6px; max-width: clamp(225px, 27.5vw, 400px); width: 100%; height:auto; }
