@@ -174,14 +174,16 @@ body{margin:0;background:radial-gradient(1200px 600px at 15% -10%, rgba(22,255,2
 .lh-metric{ display:inline-flex; flex-direction:column; align-items:center; margin-right:12px; }
 .lh-circle{ width:48px; height:48px; border-radius:50%; border:2px solid var(--border); display:flex; align-items:center; justify-content:center; font-weight:700; }
 
-/* v38.3.11 — Restore About photo visual size; keep text tight */
+/* v38.3.12 — Restore larger About photo size (match prior), keep text tight */
 .section .about-card{
-  grid-template-columns: auto 1fr !important;             /* left col hugs image width */
-  gap: clamp(6px, 0.8vw, 12px) !important;
+  grid-template-columns: 60% 1fr !important;      /* left column = 60% like the earlier version */
+  gap: clamp(6px, 0.8vw, 12px) !important;        /* small gap between photo and text */
 }
 .section .about-card .about-photo{
-  width: clamp(480px, 40vw, 620px) !important;            /* approx v38.3.7 size */
-  max-width: 100% !important;
+  width: 100% !important;                          /* image fills the left column */
+  max-width: none !important;                       /* remove earlier caps */
   margin: 0 !important;
 }
-.section .about-card .about-body{ padding-left: 8px !important; }
+.section .about-card .about-body{
+  padding-left: 8px !important;                     /* minimal spacing */
+}
