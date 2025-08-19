@@ -174,10 +174,14 @@ body{margin:0;background:radial-gradient(1200px 600px at 15% -10%, rgba(22,255,2
 .lh-metric{ display:inline-flex; flex-direction:column; align-items:center; margin-right:12px; }
 .lh-circle{ width:48px; height:48px; border-radius:50%; border:2px solid var(--border); display:flex; align-items:center; justify-content:center; font-weight:700; }
 
-/* v38.3.9 — Restore photo size; pull text closer */
+/* v38.3.10 — About: text closer, photo size restored via clamp */
 .section .about-card{
-  grid-template-columns: 1fr 1fr !important;           /* don't expand image column */
-  gap: clamp(4px, 0.6vw, 8px) !important;              /* tiny gap */
+  grid-template-columns: auto 1fr !important;   /* left column hugs image width */
+  gap: clamp(6px, 0.8vw, 12px) !important;      /* small gap between image and text */
 }
-.section .about-card .about-photo{ margin: 0 !important; max-width: 640px !important; width: 60% !important; }
-.section .about-card .about-body{ padding-left: 8px !important; margin-left: 0 !important; }
+.section .about-card .about-photo{
+  width: clamp(320px, 30vw, 520px) !important;  /* visual size similar to v38.3.7 */
+  max-width: 100% !important;
+  margin: 0 !important;
+}
+.section .about-card .about-body{ padding-left: 8px !important; }
