@@ -1,75 +1,98 @@
-export async function handler(event, context) {
-  try {
+
+// Cloudflare Analytics via GraphQL — tolerant handler
+exports.handler = async (event) => {
+  try{
     const token = process.env.CF_API_TOKEN;
-    const zone = process.env.CF_ZONE_ID;
-    if (!token || !zone) {
-      return resp(503, { enabled:false, reason:"missing CF env vars" });
+    const zone  = process.env.CF_ZONE_ID;
+    if(!token || !zone){
+      return { statusCode: 200, body: JSON.stringify({ enabled:false, ok:false, reason:"Missing CF_API_TOKEN or CF_ZONE_ID" }) };
     }
-    const params = event.queryStringParameters || {};
-    let days = parseInt(params.days || "7", 10);
-    if (isNaN(days) || days <= 0) days = 7;
-    if (days > 90) days = 90;
-    const end = new Date();
-    const start = new Date(Date.now() - days*24*3600*1000);
-    const query = `
-      query($zone: String!, $start: Time!, $end: Time!) {
+    const qs = event && event.queryStringParameters || {};
+    const days = Math.max(1, Math.min(90, parseInt(qs.days||'7',10)||7));
+
+    const now = new Date();
+    const since7 = new Date(now.getTime() - days*24*3600*1000).toISOString();
+    const since30 = new Date(now.getTime() - 30*24*3600*1000).toISOString();
+    const until = now.toISOString();
+
+    async function gql(query, variables){
+      const r = await fetch("https://api.cloudflare.com/client/v4/graphql", {
+        method: "POST",
+        headers: { "Content-Type":"application/json", Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ query, variables })
+      });
+      return r.json();
+    }
+
+    // 1) 1d totals (requests)
+    const qTotals = `
+      query($zone:String!, $since:Time!, $until:Time!){
         viewer {
-          zones(filter: { zoneTag: $zone }) {
-            httpRequestsAdaptiveGroups(
-              limit: 100
-              filter: { datetime_geq: $start, datetime_leq: $end }
-            ) {
-              sum { requests, bytes, threatsBlocked: threats }
-              dimensions { edgeResponseStatus }
-            }
-            firewallEventsAdaptiveGroups(
-              limit: 100
-              filter: { datetime_geq: $start, datetime_leq: $end }
-            ) { dimensions { action } count }
-            topCountries: httpRequests1dGroups(limit: 100, filter: { datetime_geq: $start, datetime_leq: $end }) {
-              dimensions { clientCountryName }
+          zones(filter:{ zoneTag: $zone }) {
+            httpRequests1dGroups(limit: 100, filter:{ datetime_geq: $since, datetime_leq: $until }) {
               sum { requests }
+              dimensions { date }
             }
           }
         }
       }`;
-    const variables = { zone, start: start.toISOString(), end: end.toISOString() };
-    const cf = await fetch("https://api.cloudflare.com/client/v4/graphql", {
-      method: "POST",
-      headers: { "Content-Type":"application/json", "Authorization":`Bearer ${token}` },
-      body: JSON.stringify({ query, variables })
-    });
-    const json = await cf.json();
-    if (json.errors) {
-      return resp(200, { enabled:false, reason:"Cloudflare GraphQL error", errors: json.errors });
-    }
-    const zones = json?.data?.viewer?.zones || [];
-    const z = zones[0] || {};
-    const reqGroups = z.httpRequestsAdaptiveGroups || [];
-    let totalReq = 0, totalBytes = 0, totalThreats = 0;
-    for (const g of reqGroups) {
-      totalReq += g?.sum?.requests || 0;
-      totalBytes += g?.sum?.bytes || 0;
-      totalThreats += g?.sum?.threatsBlocked || 0;
-    }
-    const waf = z.firewallEventsAdaptiveGroups || [];
-    const wafTotal = waf.reduce((a, g) => a + (g?.count || 0), 0);
-    const countryGroups = z.topCountries || [];
-    const byCountry = {};
-    for (const c of countryGroups) {
-      const name = c?.dimensions?.clientCountryName || "Unknown";
-      byCountry[name] = (byCountry[name] || 0) + (c?.sum?.requests || 0);
-    }
-    const top = Object.entries(byCountry).sort((a,b)=>b[1]-a[1]).slice(0,5).map(([country, visits])=>({country, visits}));
-    return resp(200, {
-      enabled:true,
-      requests_week: totalReq,
-      bytes_week: totalBytes,
-      waf_blocked_week: Math.max(totalThreats, wafTotal),
-      top_countries_30d: top
-    });
-  } catch (e) {
-    return resp(500, { enabled:false, reason:String(e) });
+    const tRes = await gql(qTotals, { zone, since: since7, until });
+    let requests_7d = 0;
+    try{
+      const rows = tRes.data.viewer.zones[0].httpRequests1dGroups || [];
+      requests_7d = rows.reduce((s,r)=> s + (r.sum?.requests||0), 0);
+    }catch{}
+
+    // 2) WAF blocked — firewall events (best effort; count field differs by dataset)
+    let waf_blocked_7d = 0;
+    try{
+      const qWaf = `
+        query($zone:String!, $since:Time!, $until:Time!){
+          viewer {
+            zones(filter:{ zoneTag: $zone }) {
+              firewallEventsAdaptiveGroups(
+                limit: 1000,
+                filter:{ datetime_geq: $since, datetime_leq: $until, action_in: [BLOCK, CHALLENGE, JS_CHALLENGE, MANAGED_CHALLENGE] }
+              ){
+                count
+              }
+            }
+          }
+        }`;
+      const wRes = await gql(qWaf, { zone, since: since7, until });
+      const rows = wRes.data.viewer.zones[0].firewallEventsAdaptiveGroups || [];
+      waf_blocked_7d = rows.reduce((s,r)=> s + (r.count||0), 0);
+    }catch{ /* tolerate schema issues */ }
+
+    // 3) Top countries (30d)
+    let top_countries_30d = [];
+    try{
+      const qCountries = `
+        query($zone:String!, $since:Time!, $until:Time!){
+          viewer {
+            zones(filter:{ zoneTag: $zone }) {
+              httpRequestsAdaptiveGroups(
+                limit: 1000,
+                orderBy:[sum_requests_DESC],
+                filter:{ datetime_geq: $since, datetime_leq: $until }
+              ){
+                dimensions { clientCountryName: clientCountryName clientCountryCode: clientCountry }
+                sum { requests }
+              }
+            }
+          }
+        }`;
+      const cRes = await gql(qCountries, { zone, since: since30, until });
+      const rows = cRes.data.viewer.zones[0].httpRequestsAdaptiveGroups || [];
+      top_countries_30d = rows
+        .map(r=>({ country: (r.dimensions?.clientCountryCode||'').toUpperCase(), name: r.dimensions?.clientCountryName || '', requests: r.sum?.requests||0 }))
+        .filter(r=>r.requests>0)
+        .sort((a,b)=>b.requests-a.requests)
+        .slice(0,5);
+    }catch{}
+
+    return { statusCode: 200, body: JSON.stringify({ ok:true, enabled:true, requests_7d, waf_blocked_7d, top_countries_30d }) };
+  }catch(e){
+    return { statusCode: 200, body: JSON.stringify({ ok:false, enabled:false, reason: String(e) }) };
   }
-}
-function resp(code, obj){ return { statusCode: code, headers: { "Content-Type":"application/json" }, body: JSON.stringify(obj) }; }
+};
