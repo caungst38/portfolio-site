@@ -73,3 +73,15 @@ nav .has-submenu:hover .submenu { display: block; }
 nav .submenu li { list-style: none; }
 nav .submenu a { display: block; padding: 0.4rem 0.8rem; text-decoration: none; }
 .footer-links a { text-decoration: none; }
+
+
+/* v33 adjustments */
+.header-logo, .brand-logo img, header img.logo, img.header-logo {
+  max-height: 48px;
+  width: auto;
+  border-radius: .5rem;
+}
+.hero-headshot { display:block; margin:1rem auto; border-radius:1rem; max-width:420px; height:auto; }
+.hero-lg { transform: none; } /* avoid oversized scaling */
+nav ul li { list-style: none; display:inline-block; margin-left:1rem; }
+.footer-links { margin-top:.5rem; opacity:.9; }

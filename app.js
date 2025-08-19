@@ -1,4 +1,26 @@
 
+async function fetchCfStats(days=7){
+  try{
+    const r = await fetch(`/.netlify/functions/cf-stats?days=${days}`);
+    const j = await r.json();
+    return j;
+  }catch(e){
+    return {enabled:false,error:String(e)};
+  }
+}
+
+function normalizeCfStats(j){
+  if (!j) return {enabled:false};
+  // Accept several shapes
+  const enabled = j.enabled ?? j.ok ?? false;
+  const requests = j.requests_7d ?? j.totals?.requests ?? 0;
+  const pageviews = j.pageviews_7d ?? j.totals?.pageViews ?? j.pageviews ?? 0;
+  const countries = j.top_countries_7d ?? j.top_countries_24h ?? j.countries ?? [];
+  const rate = j.rate_limited_7d ?? j.rate_limited_24h ?? {total:0,actions:[]};
+  return {enabled, requests_7d: requests, pageviews_7d: pageviews, top_countries: countries, rate_limited: rate, error: j.error};
+}
+
+
 async function fetchJSON(path){
   const r = await fetch(path);
   if(!r.ok) throw new Error(`Failed to fetch ${path}`);
@@ -84,4 +106,21 @@ document.addEventListener('DOMContentLoaded', ()=>{
   document.getElementById('year').textContent = new Date().getFullYear();
   loadProjects();
   loadStats();
+});
+
+
+document.addEventListener('DOMContentLoaded', async () => {
+  const statsEl = document.querySelector('#cf-stats');
+  if (!statsEl) return;
+  const raw = await fetchCfStats(7);
+  const data = normalizeCfStats(raw);
+  if (!data.enabled || (data.pageviews_7d===0 && data.requests_7d===0 && !data.error)){
+    statsEl.querySelector('.status')?.replaceChildren(document.createTextNode('Unavailable'));
+  } else {
+    const pv = statsEl.querySelector('.pageviews');
+    if (pv) pv.textContent = (data.pageviews_7d||0).toLocaleString();
+  }
+  if (data.error){
+    console.warn('cf-stats error:', data.error);
+  }
 });
