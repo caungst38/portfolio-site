@@ -1,126 +1,118 @@
+const $ = (sel, ctx=document) => ctx.querySelector(sel);
 
-async function fetchCfStats(days=7){
-  try{
-    const r = await fetch(`/.netlify/functions/cf-stats?days=${days}`);
-    const j = await r.json();
-    return j;
-  }catch(e){
-    return {enabled:false,error:String(e)};
+const tagColors = {};
+function colorFor(tag){
+  const key = tag.toLowerCase();
+  if(!tagColors[key]){
+    const palette = ['#5ad1ff','#52ffb8','#ffb452','#ce7aff','#ffd166','#8affc1','#a9b1ff','#ff89a7'];
+    tagColors[key] = palette[Object.keys(tagColors).length % palette.length];
   }
+  return tagColors[key];
 }
-
-function normalizeCfStats(j){
-  if (!j) return {enabled:false};
-  // Accept several shapes
-  const enabled = j.enabled ?? j.ok ?? false;
-  const requests = j.requests_7d ?? j.totals?.requests ?? 0;
-  const pageviews = j.pageviews_7d ?? j.totals?.pageViews ?? j.pageviews ?? 0;
-  const countries = j.top_countries_7d ?? j.top_countries_24h ?? j.countries ?? [];
-  const rate = j.rate_limited_7d ?? j.rate_limited_24h ?? {total:0,actions:[]};
-  return {enabled, requests_7d: requests, pageviews_7d: pageviews, top_countries: countries, rate_limited: rate, error: j.error};
-}
-
-
-async function fetchJSON(path){
-  const r = await fetch(path);
-  if(!r.ok) throw new Error(`Failed to fetch ${path}`);
-  return r.json();
-}
-function el(html){ const t=document.createElement('template'); t.innerHTML=html.trim(); return t.content.firstElementChild; }
-
-function renderProjects(containerId, items){
-  const root = document.getElementById(containerId);
-  if(!root) return;
-  const frag = document.createDocumentFragment();
-  for(const p of items){
-    const imgSrc = p.image;
-    const card = el(`<article class="card project-card">
-      <img src="${imgSrc}" alt="${p.title} preview" loading="lazy"/>
-      <h3>${p.title}</h3>
-      <p>${p.description}</p>
-      <div class="tags">${(p.tags||[]).map(t=>`<span class="pill">${t}</span>`).join(' ')}</div>
-    </article>`);
-    card.addEventListener('click', ()=>openLightbox(imgSrc, p.title));
-    frag.appendChild(card);
-  }
-  root.innerHTML = "";
-  root.appendChild(frag);
-}
-
-function openLightbox(src, caption){
-  const lb = document.getElementById('lightbox');
-  document.getElementById('lightboxImage').src = src;
-  document.getElementById('lightboxCaption').textContent = caption || '';
-  lb.setAttribute('aria-hidden','false');
-}
-document.addEventListener('click', (e)=>{
-  if(e.target.closest('.lightbox-close') || (e.target.id==='lightbox')){
-    document.getElementById('lightbox').setAttribute('aria-hidden','true');
-  }
-});
 
 async function loadProjects(){
+  const res = await fetch('projects.json');
+  const data = await res.json();
+  const add = (arr, gridId, ddId)=>{
+    const grid = document.getElementById(gridId);
+    const dd = document.getElementById(ddId);
+    grid.innerHTML=''; dd.innerHTML='';
+    arr.forEach(p=>{
+      const card = document.createElement('div');
+      card.className='card project-card'; card.id=p.id;
+      card.innerHTML = `
+        <img src="${p.image}" alt="${p.title}" onerror="this.onerror=null; this.src='assets/images/projects/placeholder-project.webp'">
+        <h3>${p.title}</h3>
+        <p>${p.summary||''}</p>
+        <div class="tags">${(p.tags||[]).map(t=>`<span class="tag" style="background:${colorFor(t)}22;border-color:${colorFor(t)}44;color:${colorFor(t)}">${t}</span>`).join('')}</div>
+        ${p.links && p.links.length ? `<p>${p.links.map(l=>`<a href="${l.url}" target="_blank" rel="noopener">${l.label}</a>`).join(' · ')}</p>` : ''}
+      `;
+      grid.appendChild(card);
+      const a = document.createElement('a');
+      a.href = '#'+p.id; a.textContent=p.title; dd.appendChild(a);
+    });
+  };
+  add(data.general, 'general-grid', 'dd-general');
+  add(data.security, 'security-grid', 'dd-security');
+}
+loadProjects();
+
+function detectBrowser(){
+  const ua = navigator.userAgent;
+  let browser='Unknown', version='';
+  const m = ua.match(/(Edg|Chrome|Safari|Firefox|OPR|Brave|MSIE|Trident)\/?([\d.]+)/);
+  if(m){
+    const map = {Edg:'Edge', OPR:'Opera'};
+    browser = map[m[1]] || m[1]; if(browser==='Trident') browser='IE';
+    version = m[2];
+  }
+  return browser + (version? ' ' + version : '');
+}
+function detectDevice(){
+  const w = Math.max(screen.width, screen.height);
+  if (/Mobi|Android/i.test(navigator.userAgent)) return 'Mobile';
+  if (w>=1600) return 'Desktop';
+  return 'Laptop';
+}
+async function detectHeaders(){
   try{
-    const data = await fetchJSON('projects.json');
-    renderProjects('generalProjects', data.general||[]);
-    renderProjects('securityProjects', data.security||[]);
+    const res = await fetch(window.location.href, { method:'GET', cache:'no-store' });
+    const headers = ['strict-transport-security','content-security-policy','x-content-type-options','x-frame-options','referrer-policy','permissions-policy'];
+    const found = headers.filter(h => res.headers.get(h));
+    return found.length? found.map(h=>h.toUpperCase()).join(', ') : 'None detected';
+  }catch(e){ return 'Unavailable'; }
+}
+function setStat(key, v){
+  const el = document.querySelector(`[data-fill="${key}"]`);
+  if(!el) return;
+  if(key==='lighthouse') el.innerHTML = v;
+  else el.textContent = v;
+}
+async function loadCF(days=7){
+  try{
+    const res = await fetch(`/.netlify/functions/cf-stats?days=${days}`);
+    const j = await res.json();
+    if(j && j.enabled){
+      setStat('requests_week', (j.requests_week||0).toLocaleString());
+      setStat('waf_blocked', (j.waf_blocked_week||0).toLocaleString());
+      const countries = (j.top_countries_30d||[]).map((c,i)=>`${i+1}. ${flag(c.country)} ${c.country} — ${c.visits.toLocaleString()}`).join('\n');
+      setStat('countries', countries || 'No data');
+    } else {
+      setStat('requests_week', 'Unavailable');
+      setStat('waf_blocked', 'Unavailable');
+      setStat('countries', 'Unavailable');
+    }
   }catch(e){
-    console.error('Projects load failed', e);
+    setStat('requests_week','Error'); setStat('waf_blocked','Error'); setStat('countries','Error');
   }
 }
-
-async function loadStats(){
-  const setStatus = (txt)=>{ const el=document.getElementById('cfStatus'); if(el) el.textContent = txt; };
+async function loadLighthouse(){
   try{
-    const r = await fetch('/.netlify/functions/cf-stats?days=7');
-    if(!r.ok) throw new Error('cf-stats http '+r.status);
-    const j = await r.json();
-    if(!j || j.enabled===false) throw new Error(j?.reason||j?.error||'disabled');
-
-    setStatus('Connected');
-
-    const countriesEl = document.getElementById('topCountries');
-    if(countriesEl){
-      const arr = j.top_countries_24h || [];
-      countriesEl.innerHTML = arr.slice(0,5).map(c=>`<span class="pill">${c.country} · ${Number(c.count||0).toLocaleString()}</span>`).join(' ');
-      if(!arr.length){ (countriesEl.closest('.card')||countriesEl).style.display='none'; }
+    const res = await fetch('/.netlify/functions/netlify-lighthouse');
+    const j = await res.json();
+    if(j && j.enabled){
+      const s = j.scores || {};
+      const circle = (label, val)=>`<div style="display:inline-block;margin-right:10px;text-align:center"><div style="width:48px;height:48px;border-radius:50%;border:4px solid ${scoreColor(val)};line-height:40px;font-weight:700">${val}</div><div style="font-size:.75rem;color:#9fb3c8">${label}</div></div>`;
+      const html = `${circle('Perf', s.performance)}${circle('A11y', s.accessibility)}${circle('Best', s.bestPractices)}${circle('SEO', s.seo)}${circle('PWA', s.pwa)}`;
+      setStat('lighthouse', html);
+    } else {
+      setStat('lighthouse','Connect Netlify API');
     }
-    const rlEl = document.getElementById('rateLimited');
-    if(rlEl){
-      const data = j.rate_limited_24h || { total: 0, actions: [] };
-      const list = (data.actions||[]).slice(0,4).map(a=>`<span class="pill">${a.action} · ${Number(a.count||0).toLocaleString()}</span>`).join(' ');
-      rlEl.innerHTML = `Total: ${Number(data.total||0).toLocaleString()}${list ? ' · ' + list : ''}`;
-      if(!data.total){ (rlEl.closest('.card')||rlEl).style.display='none'; }
-    }
-  }catch(e){
-    setStatus('Unavailable');
-    for(const id of ['topCountries','rateLimited']){
-      const el=document.getElementById(id);
-      if(el) (el.closest('.card')||el).style.display='none';
-    }
-    console.error('cf-stats failed', e);
-  }
+  }catch(e){ setStat('lighthouse','Unavailable'); }
+}
+function scoreColor(v){ if(v>=90) return '#0cce6b'; if(v>=50) return '#ffa400'; return '#ff4e42'; }
+function flag(country){
+  const map = {'United States':'🇺🇸','Canada':'🇨🇦','United Kingdom':'🇬🇧','Germany':'🇩🇪','France':'🇫🇷','India':'🇮🇳','Australia':'🇦🇺'};
+  return map[country] || '🏳️';
 }
 
-document.addEventListener('DOMContentLoaded', ()=>{
-  document.getElementById('year').textContent = new Date().getFullYear();
-  loadProjects();
-  loadStats();
-});
-
-
-document.addEventListener('DOMContentLoaded', async () => {
-  const statsEl = document.querySelector('#cf-stats');
-  if (!statsEl) return;
-  const raw = await fetchCfStats(7);
-  const data = normalizeCfStats(raw);
-  if (!data.enabled || (data.pageviews_7d===0 && data.requests_7d===0 && !data.error)){
-    statsEl.querySelector('.status')?.replaceChildren(document.createTextNode('Unavailable'));
-  } else {
-    const pv = statsEl.querySelector('.pageviews');
-    if (pv) pv.textContent = (data.pageviews_7d||0).toLocaleString();
-  }
-  if (data.error){
-    console.warn('cf-stats error:', data.error);
-  }
-});
+(function init(){
+  setStat('browser', detectBrowser());
+  setStat('device', detectDevice());
+  const secure = window.isSecureContext || location.protocol === 'https:';
+  const lock = document.querySelector('[data-fill="lock"]'); if(lock) lock.textContent = secure? '🔒' : '🔓';
+  setStat('https', secure? 'Encrypted' : 'Not encrypted');
+  detectHeaders().then(v=> setStat('headers', v));
+  loadCF(7);
+  loadLighthouse();
+})();

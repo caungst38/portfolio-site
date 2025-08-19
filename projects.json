@@ -1,58 +1,64 @@
 {
   "general": [
     {
+      "id": "portfolio-website",
       "title": "Portfolio Website (Netlify + Cloudflare)",
-      "description": "This site: static frontend on Netlify with Cloudflare in front (DNS/TLS/WAF/caching). Includes a Netlify Function that queries Cloudflare GraphQL Analytics to display live stats.",
       "image": "assets/images/projects/placeholder-project.webp",
+      "summary": "Static site hosted on Netlify with Cloudflare proxy/WAF, serverless functions, and analytics.",
       "tags": [
-        "Web",
         "HTML",
         "CSS",
         "JavaScript",
         "Netlify",
-        "Cloudflare",
-        "DNS",
-        "WAF",
-        "TLS"
+        "Cloudflare"
+      ],
+      "links": [
+        {
+          "label": "GitHub",
+          "url": "https://github.com/caungst38/portfolio-site"
+        }
       ]
     },
     {
+      "id": "custom-pc-build",
       "title": "Custom PC Build",
-      "description": "Planned and assembled a high\u2011performance workstation. Optimized UEFI, enabled Secure Boot/TPM, tuned airflow and cable management, and validated thermals/stability.",
       "image": "assets/images/projects/pc-build.webp",
-      "imageFallback": "assets/images/projects/pc-build.jpg",
+      "summary": "High-performance workstation build for security labs and content workflows.",
       "tags": [
         "Hardware",
-        "PC Build",
-        "Cooling",
+        "Workstation",
         "Windows",
-        "UEFI"
-      ]
+        "Build Log"
+      ],
+      "links": []
     }
   ],
   "security": [
     {
+      "id": "blue-team-siem-waf",
       "title": "Blue Team: SIEM + WAF Detections",
-      "description": "Created Sigma\u2011style SIEM rules and Cloudflare WAF rules to detect and mitigate common web attacks; tested alerts with synthetic events.",
       "image": "assets/images/projects/placeholder-project.webp",
+      "summary": "Playbooks and detections across WAF events and SIEM correlation rules.",
       "tags": [
-        "Security \u2014 Defense",
-        "Cloudflare",
+        "Blue Team",
         "WAF",
         "SIEM",
         "Detections"
-      ]
+      ],
+      "links": []
     },
     {
+      "id": "red-team-recon-phish",
       "title": "Red Team: Recon & Phishing Lab",
-      "description": "Built a small lab to practice OSINT recon, payload delivery, and detection evasion against blue\u2011team rules (for educational purposes only).",
       "image": "assets/images/projects/placeholder-project.webp",
+      "summary": "Reconnaissance and phishing simulation lab with safe, controlled targets.",
       "tags": [
-        "Security \u2014 Offense",
-        "OSINT",
+        "Red Team",
+        "Recon",
         "Phishing",
         "OPSEC"
-      ]
+      ],
+      "links": []
     }
   ]
 }
