@@ -45,17 +45,20 @@
 <section id="hero" class="hero center">
   <div class="hero-inner center">
     <div class="hero-text">
-      <h1>Connyr Aungst</h1>
-      <p class="tagline">Cybersecurity Portfolio · Blue & Red Team · Cloud · Automation</p>
-      <div class="hero-links">
-        <a class="btn" href="#general">View Projects</a>
-        <a class="btn outline" href="#certs">Certifications</a>
-      </div>
+      <h1>Cybersecurity Portfolio</h1>
     </div>
     <picture class="hero-headshot">
-  <source srcset="assets/images/headshot.webp" type="image/webp">
-  <img src="assets/images/headshot.jpg" alt="Connyr Aungst headshot" loading="eager">
-</picture>
+      <source srcset="assets/images/headshot.webp" type="image/webp">
+      <img src="assets/images/headshot.jpg" alt="Connyr Aungst headshot" loading="eager">
+    </picture>
+    <div class="hero-text">
+      <h2 class="hero-name">Connyr Aungst</h2>
+      <p class="tagline">Blue/Red Team Ops – Cloud Security – Network Security – Incident Response</p>
+      <div class="hero-links">
+        <a class="btn" href="#general">View Projects</a>
+        <a class="btn outline" href="#stats">Site Statistics</a>
+      </div>
+    </div>
   </div>
 </section>
 
@@ -76,55 +79,67 @@
 
   
   <section id="stats" class="section">
-    <h2>Site Statistics</h2>
-    <div class="cards">
-      <article class="card">
-        <h3>Cloudflare Link</h3>
-        <div id="cfStatus">Checking...</div>
-        <small>Live analytics connection</small>
-      </article>
-      <article class="card">
-        <h3>HTTPS</h3>
-        <div id="httpsState">—</div>
-        <small>This visit</small>
-      </article>
-      <article class="card">
-        <h3>Security Headers</h3>
-        <div class="pill-list" id="secHeaders"></div>
-        <small>CSP, HSTS, XFO, XCTO, Referrer, Permissions</small>
-      </article>
-      <article class="card">
-        <h3>Cache Status</h3>
-        <div id="cacheStatus">—</div>
-        <small>style.css via Cloudflare</small>
-      </article>
-      <article class="card">
-        <h3>Top Countries (24h)</h3>
-        <div id="topCountries">—</div>
-        <small>Requests by Country</small>
-      </article>
-      <article class="card">
-        <h3>Rate Limited (24h)</h3>
-        <div id="rateLimited">—</div>
-        <small>Firewall/Rate Limiting events</small>
-      </article>
+  <h2>Site Statistics</h2>
+  <div class="cards">
+    <article class="card">
+      <h3>Browser</h3>
+      <div id="uaInfo">—</div>
+      <small>Your browser & version</small>
+    </article>
+    <article class="card">
+      <h3>Device</h3>
+      <div id="deviceType">—</div>
+      <small>Desktop / Laptop / Mobile</small>
+    </article>
+    <article class="card">
+      <h3>HTTPS</h3>
+      <div id="httpsState">—</div>
+      <small>Encrypted connection</small>
+    </article>
+    <article class="card">
+      <h3>Security Headers</h3>
+      <div class="pill-list" id="secHeaders"></div>
+      <small>Best‑practice HTTP headers</small>
+    </article>
+    <article class="card">
+      <h3>Requests Served (7d)</h3>
+      <div id="reqs7d">—</div>
+      <small>Cloudflare totals</small>
+    </article>
+    <article class="card">
+      <h3>Blocked (WAF, 7d)</h3>
+      <div id="waf7d">—</div>
+      <small>Firewall blocks</small>
+    </article>
+    <article class="card">
+      <h3>Lighthouse</h3>
+      <div id="lighthouseScores">Connect Netlify API</div>
+      <small>Performance · Accessibility · Best Practices · SEO · PWA</small>
+    </article>
+    <article class="card">
+      <h3>Top Countries (30d)</h3>
+      <div id="topCountries">—</div>
+      <small>Visitors by country</small>
+    </article>
+  </div>
+</section>
+<section id="about" class="section">
+  <h2>About Me</h2>
+  <div class="about-card">
+    <picture class="about-photo">
+      <source srcset="assets/images/headshot.webp" type="image/webp">
+      <img src="assets/images/headshot.jpg" alt="Connyr Aungst headshot" loading="lazy">
+    </picture>
+    <div class="about-body">
+      <p>Detail-oriented and driven aspiring IT professional with experience in systems administration and property/asset management in Healthcare and Real Estate settings, currently pursuing a B.S. in Cybersecurity. Skilled in network troubleshooting, system hardening, and risk assessment. Seeking to leverage hands-on IT experience and formal security training to support enterprise information security initiatives. Outside of my prior work history and passion for IT, Cybersecurity, and technology in general, I enjoy traveling domestically and abroad, staying active in the gym, playing ice hockey when I get the chance (although much less frequently than I did growing up), and spending time with family and friends in whatever ways I can.</p>
     </div>
-  </section>
+  </div>
+</section>
+
 
 
   
-  <section id="about" class="section">
-    <h2>About Me</h2>
-    <div class="about-card">
-      <picture class="about-photo">
-        <source srcset="assets/images/headshot.webp" type="image/webp">
-        <img src="assets/images/headshot.jpg" alt="Connyr Aungst headshot" loading="lazy">
-      </picture>
-      <div class="about-body">
-        <p>Cybersecurity practitioner with interests across blue/red operations, vuln management/testing, incident response, and cloud security.</p>
-      </div>
-    </div>
-  </section>
+  
 
 
   <section id="certs" class="section">

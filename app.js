@@ -1,6 +1,7 @@
 
 async function loadStats(){
   try{
+  try{
     // HTTPS state
     const httpsEl = document.getElementById('httpsState');
     if (httpsEl) {
@@ -79,4 +80,88 @@ function countryFlagEmoji(code){
   return String.fromCodePoint(...code.toUpperCase().split('').map(c => A + (c.charCodeAt(0)-65)));
 }
 
-document.addEventListener('DOMContentLoaded', loadStats);
+document.addEventListener('DOMContentLoaded', ()=>{ loadStats(); enhanceClientStats(); loadProjects(); loadLighthouse(); });
+
+
+async function loadProjects(){
+  try{
+    const res = await fetch('projects.json', { cache:'no-store' });
+    const data = await res.json();
+    const gen = data.general || [];
+    const sec = data.security || [];
+
+    const tagColor = (function(){
+      const map = new Map();
+      const colors = ['#7bdff2','#b2f7ef','#eff7f6','#f7d6e0','#f2b5d4','#cdb4db','#ffc8dd','#ffafcc','#bde0fe','#a2d2ff'];
+      return (t)=>{
+        const k = t.toLowerCase().trim();
+        if (!map.has(k)) map.set(k, colors[map.size % colors.length]);
+        return map.get(k);
+      };
+    })();
+
+    function cardHTML(p, idx, section){
+      const anchor = `${section}-card-${idx}`;
+      const tags = (p.tags||[]).map(t=>`<span class="pill" style="background:${tagColor(t)}22;border-color:${tagColor(t)}44;color:${tagColor(t)}">${t}</span>`).join(' ');
+      return `<article class="card project" id="${anchor}">
+        <div class="project-inner">
+          <div class="project-image">
+            <img src="${p.image||'assets/images/projects/placeholder-project.webp'}" alt="${p.title} image" loading="lazy"/>
+          </div>
+          <div class="project-summary">
+            <h3>${p.title}</h3>
+            <p>${p.description||''}</p>
+          </div>
+          <div class="project-tags">${tags}</div>
+        </div>
+      </article>`;
+    }
+
+    const genRoot = document.getElementById('projects-general');
+    if (genRoot) genRoot.innerHTML = gen.map((p,i)=>cardHTML(p,i,'gen')).join('');
+
+    const secRoot = document.getElementById('projects-security');
+    if (secRoot) secRoot.innerHTML = sec.map((p,i)=>cardHTML(p,i,'sec')).join('');
+
+    // Populate dropdown menus
+    const genMenu = document.getElementById('generalMenu');
+    if (genMenu) genMenu.innerHTML = gen.map((p,i)=>`<a href="#gen-card-${i}">${p.title}</a>`).join('');
+    const secMenu = document.getElementById('securityMenu');
+    if (secMenu) secMenu.innerHTML = sec.map((p,i)=>`<a href="#sec-card-${i}">${p.title}</a>`).join('');
+  }catch(e){
+    const el = document.getElementById('projects-general-error');
+    if (el) el.textContent = 'Could not load projects.';
+  }
+}
+
+async function enhanceClientStats(){
+  const uaEl = document.getElementById('uaInfo');
+  if (uaEl){
+    const ua = navigator.userAgent;
+    uaEl.textContent = ua || 'Unknown';
+  }
+  const devEl = document.getElementById('deviceType');
+  if (devEl){
+    const ua = navigator.userAgent.toLowerCase();
+    const isMobile = /mobile|iphone|android|ipad/.test(ua);
+    const isTablet = /ipad|tablet/.test(ua);
+    const device = isMobile ? 'Mobile' : (isTablet ? 'Tablet' : 'Desktop/Laptop');
+    devEl.textContent = device;
+  }
+}
+
+async function loadLighthouse(){
+  const el = document.getElementById('lighthouseScores');
+  if (!el) return;
+  try{
+    const r = await fetch('/.netlify/functions/netlify-lighthouse', { cache:'no-store' });
+    const j = await r.json();
+    if (j && j.ok && j.scores){
+      const S = j.scores;
+      const circle = (v,label)=>`<div class="lh-metric"><div class="lh-circle">${v??'—'}</div><span>${label}</span></div>`;
+      el.innerHTML = circle(S.performance,'Performance') + circle(S.accessibility,'Accessibility') + circle(S.best_practices,'Best Practices') + circle(S.seo,'SEO') + circle(S.pwa,'PWA');
+    }else{
+      el.textContent = j && j.reason ? j.reason : 'Connect Netlify API';
+    }
+  }catch{ el.textContent = 'Connect Netlify API'; }
+}

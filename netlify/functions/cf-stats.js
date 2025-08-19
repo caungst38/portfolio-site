@@ -8,12 +8,15 @@ exports.handler = async (event) => {
       return { statusCode: 200, body: JSON.stringify({ enabled:false, ok:false, reason:"Missing CF_API_TOKEN or CF_ZONE_ID" }) };
     }
     const qs = event && event.queryStringParameters || {};
+    const DEBUG = qs.debug === "1";
     const days = Math.max(1, Math.min(90, parseInt(qs.days||'7',10)||7));
 
     const now = new Date();
     const since7 = new Date(now.getTime() - days*24*3600*1000).toISOString();
     const since30 = new Date(now.getTime() - 30*24*3600*1000).toISOString();
     const until = now.toISOString();
+    const sinceDate = new Date(now.getTime() - days*24*3600*1000).toISOString().slice(0,10);
+    const untilDate = now.toISOString().slice(0,10);
 
     async function gql(query, variables){
       const r = await fetch("https://api.cloudflare.com/client/v4/graphql", {
@@ -26,17 +29,17 @@ exports.handler = async (event) => {
 
     // 1) 1d totals (requests)
     const qTotals = `
-      query($zone:String!, $since:Time!, $until:Time!){
+      query($zone:String!, $sinceDate:Date!, $untilDate:Date!){
         viewer {
           zones(filter:{ zoneTag: $zone }) {
-            httpRequests1dGroups(limit: 100, filter:{ datetime_geq: $since, datetime_leq: $until }) {
+            httpRequests1dGroups(limit: 100, filter:{ date_geq: $sinceDate, date_lt: $untilDate }) {
               sum { requests }
               dimensions { date }
             }
           }
         }
       }`;
-    const tRes = await gql(qTotals, { zone, since: since7, until });
+    const tRes = await gql(qTotals, { zone, sinceDate, untilDate });
     let requests_7d = 0;
     try{
       const rows = tRes.data.viewer.zones[0].httpRequests1dGroups || [];
@@ -91,7 +94,7 @@ exports.handler = async (event) => {
         .slice(0,5);
     }catch{}
 
-    return { statusCode: 200, body: JSON.stringify({ ok:true, enabled:true, requests_7d, waf_blocked_7d, top_countries_30d }) };
+    return { statusCode: 200, body: JSON.stringify({ ok:true, enabled:true, requests_7d, waf_blocked_7d, top_countries_30d, debug: DEBUG ? { totals:tRes } : undefined }) };
   }catch(e){
     return { statusCode: 200, body: JSON.stringify({ ok:false, enabled:false, reason: String(e) }) };
   }
