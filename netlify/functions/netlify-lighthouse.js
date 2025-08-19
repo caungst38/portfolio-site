@@ -1,9 +1,14 @@
-exports.handler = async (event) => {
-  if (!process.env.NETLIFY_AUTH_TOKEN || !process.env.NETLIFY_SITE_ID) {
-    return { statusCode: 200, body: JSON.stringify({ ok:true, enabled:false, message:"Connect Netlify API (NETLIFY_AUTH_TOKEN, NETLIFY_SITE_ID) for Lighthouse scores." }) };
+
+exports.handler = async () => {
+  try{
+    const token = process.env.NETLIFY_AUTH_TOKEN;
+    const site = process.env.NETLIFY_SITE_ID;
+    if(!token || !site){
+      return { statusCode: 200, body: JSON.stringify({ ok:false, reason:"Missing NETLIFY_AUTH_TOKEN or NETLIFY_SITE_ID" }) };
+    }
+    // Placeholder response; integrate Netlify Build API if tokens provided
+    return { statusCode: 200, body: JSON.stringify({ ok:true, scores:{ performance:null, accessibility:null, best_practices:null, seo:null, pwa:null } }) };
+  }catch(e){
+    return { statusCode: 200, body: JSON.stringify({ ok:false, reason:String(e) }) };
   }
-  // Placeholder response (since we can't call Netlify API here)
-  return { statusCode: 200, body: JSON.stringify({ ok:true, enabled:true, scores:{
-    performance: 92, accessibility: 98, best_practices: 100, seo: 96, pwa: 45
-  }})};
-};
+}

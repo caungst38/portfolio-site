@@ -1,33 +1,59 @@
 {
   "general": [
     {
-      "id": "portfolio-website",
       "title": "Portfolio Website (Netlify + Cloudflare)",
+      "description": "This site: static frontend deployed on Netlify with Cloudflare for DNS/TLS/WAF/caching. Includes rate limiting, managed challenge on PDF endpoints, strict security headers, and a Netlify function that surfaces Cloudflare analytics.",
       "image": "assets/images/projects/placeholder-project.webp",
-      "summary": "This site is deployed via Netlify, fronted by Cloudflare (DNS/TLS/WAF). Includes Cloudflare GraphQL analytics & Netlify Lighthouse metrics.",
       "tags": [
+        "Web",
         "HTML",
         "CSS",
         "JavaScript",
         "Netlify",
-        "Cloudflare"
-      ],
-      "links": {
-        "github": "https://github.com/caungst38/portfolio-site"
-      }
+        "Cloudflare",
+        "DNS",
+        "WAF",
+        "TLS",
+        "CI/CD"
+      ]
     },
     {
-      "id": "custom-pc-build",
       "title": "Custom PC Build",
+      "description": "Workstation PC planning and build. UEFI configuration with Secure Boot and TPM enabled, BitLocker full-disk encryption, thermal validation, and clean OS with driver hardening.",
       "image": "assets/images/projects/pc-build.webp",
-      "summary": "Sourced, assembled, and optimized a custom PC build. Documented BIOS, thermals, and performance tuning for daily dev + security tooling.",
       "tags": [
         "Hardware",
-        "BIOS",
-        "Performance"
-      ],
-      "links": {}
+        "PC Build",
+        "Windows",
+        "UEFI",
+        "Secure Boot",
+        "TPM",
+        "Misc"
+      ]
     }
   ],
-  "security": []
+  "security": [
+    {
+      "title": "CTF Lab: Web Exploitation",
+      "description": "Small DVWA/juice-shop styled lab for practicing input validation, auth bypass and IDOR.",
+      "image": "assets/images/projects/placeholder-project.webp",
+      "tags": [
+        "Security \u2014 Offense",
+        "Web",
+        "Scripting",
+        "Misc"
+      ]
+    },
+    {
+      "title": "Blue Team: SIEM + WAF Detections",
+      "description": "Created Sigma-style detection rules and WAF rules to detect/mitigate common web attacks.",
+      "image": "assets/images/projects/placeholder-project.webp",
+      "tags": [
+        "Security \u2014 Defense",
+        "Cloudflare",
+        "WAF",
+        "Tooling/DevOps"
+      ]
+    }
+  ]
 }

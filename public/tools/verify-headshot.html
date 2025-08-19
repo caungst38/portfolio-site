@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>v38.1 Headshot Verification</title>
+<style>
+  body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Can'tarell,Noto Sans,sans-serif;background:#0a1013;color:#e6f8f4;margin:0;padding:40px;}
+  .card{max-width:920px;margin:0 auto;border:1px solid rgba(0,245,212,.4);border-radius:16px;padding:24px;box-shadow:0 10px 30px rgba(0,245,212,.08);}
+  h1{margin-top:0;color:#9fffe8}
+  code{background:#081014;padding:2px 6px;border-radius:6px}
+  img{max-width:280px;border-radius:12px;box-shadow:0 8px 24px rgba(0,245,212,.12)}
+  .row{display:flex;gap:24px;align-items:center;flex-wrap:wrap}
+  .ok{color:#61ffca}
+  .fail{color:#ff8686}
+</style>
+<div class="card">
+  <h1>v38.1 Headshot Verification</h1>
+  <p>This page checks if the headshot is correctly deployed at <code>/images/headshot.webp</code> with a PNG fallback.</p>
+  <div class="row">
+    <picture>
+      <source srcset="/images/headshot.webp" type="image/webp">
+      <img src="/images/headshot.png" alt="Headshot" onload="status('ok')" onerror="status('fail')">
+    </picture>
+    <div id="status" style="font-weight:600"></div>
+  </div>
+  <script>
+    function status(s){
+      const el=document.getElementById('status');
+      el.textContent = s==='ok' ? 'Image loaded successfully.' : 'Image failed to load (404/CSP/Path).';
+      el.className = s==='ok' ? 'ok' : 'fail';
+    }
+  </script>
+  <hr>
+  <p>If you see a failure, ensure the image lives in <code>/public/images/headshot.webp</code> (and .png) and that any CSP header allows <code>img-src 'self' data: https:</code>.</p>
+</div>
+</html>
