@@ -174,13 +174,13 @@ body{margin:0;background:radial-gradient(1200px 600px at 15% -10%, rgba(22,255,2
 .lh-metric{ display:inline-flex; flex-direction:column; align-items:center; margin-right:12px; }
 .lh-circle{ width:48px; height:48px; border-radius:50%; border:2px solid var(--border); display:flex; align-items:center; justify-content:center; font-weight:700; }
 
-/* v38.3.10 — About: text closer, photo size restored via clamp */
+/* v38.3.11 — Restore About photo visual size; keep text tight */
 .section .about-card{
-  grid-template-columns: auto 1fr !important;   /* left column hugs image width */
-  gap: clamp(6px, 0.8vw, 12px) !important;      /* small gap between image and text */
+  grid-template-columns: auto 1fr !important;             /* left col hugs image width */
+  gap: clamp(6px, 0.8vw, 12px) !important;
 }
 .section .about-card .about-photo{
-  width: clamp(320px, 30vw, 520px) !important;  /* visual size similar to v38.3.7 */
+  width: clamp(480px, 40vw, 620px) !important;            /* approx v38.3.7 size */
   max-width: 100% !important;
   margin: 0 !important;
 }
