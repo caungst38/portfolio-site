@@ -1,6 +1,7 @@
 
+/* app.js — corrected syntax; full Browser + OS details in #uaInfo; fills reqs7d/waf7d; no parse errors */
+
 async function loadStats(){
-  try{
   try{
     // HTTPS state
     const httpsEl = document.getElementById('httpsState');
@@ -35,12 +36,34 @@ async function loadStats(){
       }catch(e){ cacheEl.textContent = '—'; }
     }
 
-    // Cloudflare stats
-    const res = await fetch('/.netlify/functions/cf-stats');
-    const j = await res.json();
-    const ok = !!j.ok || !!j.enabled;
+    // Cloudflare stats (safe if function is unavailable)
+    let j = {};
+    try{
+      const res = await fetch('/.netlify/functions/cf-stats');
+      j = await res.json();
+    }catch(e){
+      j = {};
+    }
+
     const cfEl = document.getElementById('cfStatus');
-    if (cfEl) cfEl.textContent = ok ? 'Connected' : (j.reason || 'Unavailable');
+    if (cfEl) {
+      const ok = !!(j.ok || j.enabled);
+      cfEl.textContent = ok ? 'Connected' : (j.reason || 'Unavailable');
+    }
+
+    // Requests Served (7d)
+    const reqsEl = document.getElementById('reqs7d');
+    if (reqsEl) {
+      const totalReqs = Number(j.requests_7d || j.requests || 0);
+      reqsEl.textContent = isFinite(totalReqs) ? totalReqs.toLocaleString() : '—';
+    }
+
+    // Blocked (WAF, 7d)
+    const wafEl = document.getElementById('waf7d');
+    if (wafEl) {
+      const blocked = Number(j.waf_blocked_7d || j.blocked || 0);
+      wafEl.textContent = isFinite(blocked) ? blocked.toLocaleString() : '—';
+    }
 
     // Top countries
     const countriesEl = document.getElementById('topCountries');
@@ -56,17 +79,9 @@ async function loadStats(){
         countriesEl.innerHTML = top;
       }
     }
-
-    // Rate limited / WAF blocked
-    const rlEl = document.getElementById('rateLimited');
-    if (rlEl) {
-      const total = j.waf_blocked_7d || (j.rate_limited_24h && j.rate_limited_24h.total) || 0;
-      if (!total) { (rlEl.closest('.card')||rlEl).style.display='none'; }
-      else rlEl.innerHTML = `<b>${Number(total).toLocaleString()}</b> in the window`;
-    }
   }catch(e){
     // Hide dynamic cards on failure
-    for(const id of ['topCountries','rateLimited','cfStatus']) {
+    for(const id of ['topCountries','cfStatus','reqs7d','waf7d']) {
       const el = document.getElementById(id);
       if (el) (el.closest('.card')||el).style.display='none';
     }
@@ -134,17 +149,73 @@ async function loadProjects(){
   }
 }
 
+// --- Client Stats ---
+// Robust browser/OS detection with UA-CH fallback to UA parsing
+function parseBrowserFromUA(ua) {
+  let name = 'Unknown', version = '';
+  const rx = (re) => (ua.match(re) || [])[1];
+
+  if (/Edg\//.test(ua))      { name = 'Edge'; version = rx(/Edg\/([\d.]+)/); }
+  else if (/OPR\//.test(ua)) { name = 'Opera'; version = rx(/OPR\/([\d.]+)/); }
+  else if (/Chrome\//.test(ua)) { name = 'Chrome'; version = rx(/Chrome\/([\d.]+)/); }
+  else if (/Firefox\//.test(ua)) { name = 'Firefox'; version = rx(/Firefox\/([\d.]+)/); }
+  else if (/Safari\//.test(ua) && !/Chrome\//.test(ua)) {
+    name = 'Safari'; version = rx(/Version\/([\d.]+)/) || rx(/Safari\/([\d.]+)/);
+  }
+  return version ? `${name} ${version}` : name;
+}
+
+function parseOSFromUA(ua) {
+  if (/Windows NT/.test(ua)) return 'Windows';
+  if (/Mac OS X/.test(ua))   return 'macOS';
+  if (/Android/.test(ua))    return 'Android';
+  if (/iPhone|iPad|iPod/.test(ua)) return 'iOS';
+  if (/Linux/.test(ua))      return 'Linux';
+  return 'Unknown';
+}
+
+async function detectBrowserDetails() {
+  const ua = navigator.userAgent || '';
+  const uaData = navigator.userAgentData;
+
+  if (uaData?.getHighEntropyValues) {
+    try {
+      const high = await uaData.getHighEntropyValues(['platform','platformVersion','uaFullVersion']);
+      const brands = (navigator.userAgentData.brands || []).filter(b => !/not.?a.?brand/i.test(b.brand));
+      const primary = brands[0];
+      const browser = primary ? `${primary.brand} ${primary.version}` :
+                      high.uaFullVersion ? `Chromium ${high.uaFullVersion}` : parseBrowserFromUA(ua);
+      const os = [high.platform, high.platformVersion].filter(Boolean).join(' ') || parseOSFromUA(ua);
+      return { browser, os };
+    } catch(e) {
+      // fall through
+    }
+  }
+
+  return { browser: parseBrowserFromUA(ua), os: parseOSFromUA(ua) };
+}
+
 async function enhanceClientStats(){
+  // Browser + OS
   const uaEl = document.getElementById('uaInfo');
   if (uaEl){
-    const ua = navigator.userAgent;
-    uaEl.textContent = ua || 'Unknown';
+    try{
+      const info = await detectBrowserDetails();
+      const text = info.browser && info.os ? `${info.browser} on ${info.os}` :
+                   info.browser || info.os || 'Unknown';
+      uaEl.textContent = text;
+    }catch(e){
+      const ua = navigator.userAgent;
+      uaEl.textContent = ua || 'Unknown';
+    }
   }
+
+  // Device type
   const devEl = document.getElementById('deviceType');
   if (devEl){
-    const ua = navigator.userAgent.toLowerCase();
-    const isMobile = /mobile|iphone|android|ipad/.test(ua);
+    const ua = (navigator.userAgent || '').toLowerCase();
     const isTablet = /ipad|tablet/.test(ua);
+    const isMobile = /mobile|iphone|android/.test(ua) && !isTablet;
     const device = isMobile ? 'Mobile' : (isTablet ? 'Tablet' : 'Desktop/Laptop');
     devEl.textContent = device;
   }
