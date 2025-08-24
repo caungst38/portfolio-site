@@ -4,8 +4,8 @@
   "files": [
     {
       "path": "index.html",
-      "sha256": "484d1d1403276b1534d2038787f7350cfbcbd794d9ceb1822949554751345dac",
-      "status": "original (hard-coded projects)"
+      "sha256": "a23574da53ac16c70d7a872b592043e108561a4e99e8c525c4f33df30df5155a",
+      "status": "original (hard-coded projects, cleaned)"
     },
     {
       "path": "style.css",
