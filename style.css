@@ -171,3 +171,34 @@ body{ background: radial-gradient(1200px 800px at 15% -10%, rgba(0,230,216,.08),
 .pill.warn{ border-color:#856404; color:#ffd37a; }
 
 :focus-visible{ outline:2px solid var(--accent); box-shadow: var(--glow); outline-offset:2px; }
+
+/* ===== v6.7 Header Links Teal ===== */
+.topbar .nav .nav-item > a {
+  color: var(--accent) !important;
+  border-bottom: 2px solid transparent;
+}
+.topbar .nav .nav-item > a:hover,
+.topbar .nav .nav-item > a:focus-visible {
+  border-color: var(--accent);
+  box-shadow: var(--glow);
+}
+
+/* ===== v6.8 Hero Teal Background Restore ===== */
+.hero {
+  position: relative;
+  background: linear-gradient(180deg, rgba(0,230,216,0.25) 0%, rgba(0,230,216,0.08) 40%, transparent 100%);
+  padding-top: 40px;
+  padding-bottom: 40px;
+}
+.hero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(1200px 600px at 50% -10%, rgba(0,230,216,0.25), transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+}
+.hero .hero-inner {
+  position: relative;
+  z-index: 1;
+}
