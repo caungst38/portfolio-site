@@ -76,3 +76,25 @@ img{max-width:100%;height:auto;display:block}
   .hero-inner{grid-template-columns:1fr;gap:10px}
   .hero-text{text-align:center}
 }
+/* --- v6.5 Patch: Header + Hero layout --- */
+.topbar{
+  display:flex; align-items:center; gap:16px;
+  padding:12px 20px; white-space:nowrap;
+}
+.topbar .brand{ display:flex; align-items:center; gap:10px; flex:0 0 auto; }
+.topbar .nav{ display:flex; align-items:center; gap:18px; flex-wrap:nowrap; margin-left:auto; }
+.topbar .nav .nav-item{ display:inline-flex; align-items:center; }
+@media (max-width: 880px){
+  .topbar{ flex-wrap:wrap; }
+  .topbar .nav{ width:100%; justify-content:flex-start; overflow-x:auto; }
+}
+.hero{ text-align:center; }
+.hero .hero-inner{ display:flex; flex-direction:column; align-items:center; gap:14px; }
+.hero .hero-text{ max-width:900px; }
+.hero .hero-headshot{ display:block; line-height:0; }
+.hero .hero-headshot img{
+  width:clamp(300px, 30vw, 460px);
+  height:auto; border-radius:16px;
+  box-shadow: 0 6px 24px rgba(0,0,0,.25);
+}
+.hero .hero-links{ display:flex; gap:12px; justify-content:center; }
