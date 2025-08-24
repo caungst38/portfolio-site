@@ -55,23 +55,7 @@
   }
 
   // Inject sample projects & certs based on provided assets
-  function addProjects(){
-    const general = document.getElementById('projects-general');
-    if(!general) return;
-    const items = [
-      {
-        title:'PC Build & Homelab',
-        img:'assets/images/projects/pc-build.webp',
-        desc:'Personal build used for lab work, virtualization and security tooling.',
-        tags:'Tooling/DevOps, Misc'
-      },
-      {
-        title:'Portfolio Website',
-        img:'assets/images/projects/placeholder-project.webp',
-        desc:'This site — built static-first with a focus on security headers and perf.',
-        tags:'Web, Security — Defense'
-      }
-    ];
+      ];
     items.forEach(it=>{
       const el = document.createElement('article');
       el.className='tile'; el.dataset.tags = it.tags;
@@ -95,6 +79,5 @@
     certs.appendChild(el);
   }
 
-  addProjects();
   addCerts();
 })();
