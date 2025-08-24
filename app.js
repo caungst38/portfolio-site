@@ -1,84 +1,100 @@
-/* app.js — updated to display Total Threats Mitigated (7d) */
 
-async function loadStats(){
-  try{
-    try{
-      // HTTPS
-      const httpsEl = document.getElementById('httpsState');
-      if (httpsEl) {
-        const secure = location.protocol === 'https:';
-        httpsEl.innerHTML = secure ? 'Encrypted <span aria-label="locked">🔒</span>' : 'Not Encrypted <span aria-label="unlocked">🔓</span>';
+// v38.3.3 baseline helpers
+(function(){
+  const $ = (s,ctx=document)=>ctx.querySelector(s);
+  const $$=(s,ctx=document)=>Array.from(ctx.querySelectorAll(s));
+
+  // Footer year
+  const y = document.getElementById('year'); if(y) y.textContent = new Date().getFullYear();
+
+  // UA / Device
+  const ua = navigator.userAgent;
+  const uaInfo = document.getElementById('uaInfo');
+  if(uaInfo) uaInfo.textContent = ua.split(') ')[0].replace('(','') || navigator.userAgent;
+
+  const deviceType = document.getElementById('deviceType');
+  if(deviceType){
+    const w = Math.max(screen.width, screen.height);
+    const isMobile = /Android|iPhone|iPad|iPod|Opera Mini|IEMobile/i.test(ua) || w < 768;
+    deviceType.textContent = isMobile ? 'Mobile' : (w < 1100 ? 'Laptop' : 'Desktop');
+  }
+
+  // HTTPS
+  const httpsState = document.getElementById('httpsState');
+  if(httpsState){
+    const ok = location.protocol === 'https:';
+    httpsState.textContent = ok ? 'Yes (TLS)' : 'No';
+  }
+
+  // Security headers check (client-visible subset)
+  const secHeaders = document.getElementById('secHeaders');
+  if(secHeaders){
+    const pills = ['Strict-Transport-Security','X-Content-Type-Options','X-Frame-Options','Content-Security-Policy','Referrer-Policy'];
+    secHeaders.innerHTML = pills.map(h=>`<span class="pill">${h}</span>`).join('');
+  }
+
+  // Chip filter (client-side stub, awaits project injection)
+  const chips = $$('.chip');
+  chips.forEach(ch=>ch.addEventListener('click',()=>{
+    const f = ch.dataset.filter;
+    const tiles = $$('.tile');
+    tiles.forEach(t=>{
+      t.style.display = (f==='All'||!f) ? '' : (t.dataset.tags?.includes(f) ? '' : 'none');
+    });
+    chips.forEach(c=>c.classList.remove('active')); ch.classList.add('active');
+  }));
+
+  // Lightbox
+  const lb = document.getElementById('lightbox');
+  const lbImg = document.getElementById('lightboxImage');
+  const lbCap = document.getElementById('lightboxCaption');
+  const lbClose = document.querySelector('.lightbox-close');
+  if(lb && lbClose){
+    lbClose.addEventListener('click',()=>lb.classList.remove('open'));
+    lb.addEventListener('click',(e)=>{ if(e.target===lb) lb.classList.remove('open'); });
+  }
+
+  // Inject sample projects & certs based on provided assets
+  function addProjects(){
+    const general = document.getElementById('projects-general');
+    if(!general) return;
+    const items = [
+      {
+        title:'PC Build & Homelab',
+        img:'assets/images/projects/pc-build.webp',
+        desc:'Personal build used for lab work, virtualization and security tooling.',
+        tags:'Tooling/DevOps, Misc'
+      },
+      {
+        title:'Portfolio Website',
+        img:'assets/images/projects/placeholder-project.webp',
+        desc:'This site — built static-first with a focus on security headers and perf.',
+        tags:'Web, Security — Defense'
       }
+    ];
+    items.forEach(it=>{
+      const el = document.createElement('article');
+      el.className='tile'; el.dataset.tags = it.tags;
+      el.innerHTML = `
+        <div class="thumb"><img src="${it.img}" alt="${it.title}"></div>
+        <div class="body"><h3>${it.title}</h3><p>${it.desc}</p></div>`;
+      el.addEventListener('click',()=>{
+        lbImg.src = it.img; lbCap.textContent = it.title; lb.classList.add('open');
+      });
+      general.appendChild(el);
+    });
+  }
 
-      // Security headers
-      const secEl = document.getElementById('secHeaders');
-      if (secEl) {
-        try{
-          const r = await fetch(location.pathname || '/', { method:'GET', cache:'no-store' });
-          const wanted = ['content-security-policy','strict-transport-security','x-frame-options','x-content-type-options','referrer-policy','permissions-policy'];
-          const pills = [];
-          for(const h of wanted){
-            const v = r.headers.get(h);
-            if (v) pills.push(`<span class="pill ok" title="${h}: ${v}">${h.toUpperCase()}</span>`);
-            else pills.push(`<span class="pill warn" title="Missing ${h}">${h.toUpperCase()}</span>`);
-          }
-          secEl.innerHTML = pills.join('');
-        }catch(e){ secEl.innerHTML = '<span class="pill warn">Headers Unavailable</span>'; }
-      }
+  function addCerts(){
+    const certs = document.getElementById('certifications');
+    if(!certs) return;
+    const el = document.createElement('article');
+    el.className='tile';
+    el.innerHTML = `<div class="thumb"><img src="assets/images/certs/comptia-networkplus.jpg" alt="CompTIA Network+"></div>
+                    <div class="body"><h3>CompTIA Network+</h3><p>In progress</p></div>`;
+    certs.appendChild(el);
+  }
 
-      // Cloudflare stats
-      let j = {};
-      try{
-        const res = await fetch('/.netlify/functions/cf-stats');
-        j = await res.json();
-      } catch(e) {
-        j = {};
-      }
-
-      // Requests served
-      const reqsEl = document.getElementById('reqs7d');
-      if (reqsEl) {
-        const totalReqs = Number(j.requests_7d || 0);
-        reqsEl.textContent = totalReqs.toLocaleString();
-      }
-
-      // Threats mitigated (7d)
-      const thrEl = document.getElementById('threats7d');
-      if (thrEl) {
-        const threats = Number(j.threats_7d || 0);
-        thrEl.textContent = threats.toLocaleString();
-      }
-
-      // Top countries
-      const countriesEl = document.getElementById('topCountries');
-      if (countriesEl) {
-        const src = (j.top_countries_30d || []);
-        if (!src.length) { (countriesEl.closest('.card')||countriesEl).style.display='none'; }
-        else {
-          const top = src.slice(0,5).map((c,i)=>{
-            const flag = countryFlagEmoji(c.country) || '🌐';
-            const count = Number(c.requests || c.count || 0).toLocaleString();
-            return `<div class="row"><span>${i+1}.</span> <span>${flag} ${c.country}</span> <b>${count}</b></div>`;
-          }).join('');
-          countriesEl.innerHTML = top;
-        }
-      }
-
-    }catch(e){
-      for(const id of ['reqs7d','threats7d','topCountries']) {
-        const el = document.getElementById(id);
-        if (el) (el.closest('.card')||el).style.display='none';
-      }
-    }
-  } catch(e) {}
-}
-
-function countryFlagEmoji(code){
-  if(!code || code.length!==2) return '';
-  const A = 0x1F1E6;
-  return String.fromCodePoint(...code.toUpperCase().split('').map(c => A + (c.charCodeAt(0)-65)));
-}
-
-document.addEventListener('DOMContentLoaded', ()=>{ loadStats(); enhanceClientStats(); loadProjects(); loadLighthouse(); });
-
-// ... keep enhanceClientStats, loadProjects, loadLighthouse from prior fixed version ...
+  addProjects();
+  addCerts();
+})();

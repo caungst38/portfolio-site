@@ -1,0 +1,63 @@
+{
+  "version": "v38.3.3",
+  "generated": "2025-08-24T18:35:56.664701Z",
+  "files": [
+    {
+      "path": "index.html",
+      "sha256": "484d1d1403276b1534d2038787f7350cfbcbd794d9ceb1822949554751345dac",
+      "status": "original (hard-coded projects)"
+    },
+    {
+      "path": "style.css",
+      "sha256": "ee736114b94bafd3db569ce68562fad6029a5b5fbb42c1deef6d091a1f4cee2b"
+    },
+    {
+      "path": "app.js",
+      "sha256": "15f779e9faac063abc40fa040155ee4505f95f83673086c236f9f8d543000aa9"
+    },
+    {
+      "path": "favicon.jpg",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "assets/images/about-photo.png",
+      "sha256": "96e12af62eb43b07a4024c96654ccd5c08c34ca51f3647bbef8c6f7db0106c1d"
+    },
+    {
+      "path": "assets/images/about-photo.webp",
+      "sha256": "9ab4fd79a711781100a0bbea8c9bdce9a9b840eb6a0cf59308c8bb2471f6aacf"
+    },
+    {
+      "path": "assets/images/about-photo@2x.webp",
+      "sha256": "8ddfcb32f37df0c096cba50757e168f40dcb891ffc5cbd99da558604b3f560b3"
+    },
+    {
+      "path": "assets/images/headshot.jpg",
+      "sha256": "fdb24766355b2a726056ad4fcee25d19127ac4386dfc93b46edf11fedb036d65"
+    },
+    {
+      "path": "assets/images/headshot.webp",
+      "sha256": "943171cfbb5b07256cf03d53f6259c593539a79a20f5a1d2a12c8f7df7f6a3b0"
+    },
+    {
+      "path": "assets/images/logo/ca.webp",
+      "sha256": "6eb2e72695bdd19efca02a7c44b52bed7464d3990269322e898effd25dabe030"
+    },
+    {
+      "path": "assets/images/certs/comptia-networkplus.jpg",
+      "sha256": "c14ac3a82a225c4e408178159c8cbde3bc940ac8fe36d8027d293314063bf264"
+    },
+    {
+      "path": "assets/images/projects/pc-build.webp",
+      "sha256": "e05c564e7727815295dccdc22a6752a4e0d74f638fc7b9e0ab451770fda83639"
+    },
+    {
+      "path": "assets/images/projects/pc-build.jpg",
+      "sha256": "6117fc656c4f8820ccfd4fa0e940bb186623f750bd5b96d5a929d179045cb46b"
+    },
+    {
+      "path": "assets/images/projects/placeholder-project.webp",
+      "sha256": "f5e17d4287aabb88a6f6e34e7ca2a0cef86d91070d11cb14c577542a9168dedd"
+    }
+  ]
+}
