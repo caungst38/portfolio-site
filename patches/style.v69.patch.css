@@ -1,0 +1,16 @@
+/* ===== v6.9 Header & Nav Enhancements (v69 patch) ===== */
+.topbar {
+  border-bottom: 2px solid rgba(0,230,216,.35);
+  box-shadow: 0 2px 12px rgba(0,230,216,.15);
+}
+
+/* active link gets teal underline and glow */
+.topbar .nav .nav-item > a.active {
+  border-bottom: 2px solid var(--accent);
+  color: var(--accent) !important;
+  box-shadow: var(--glow);
+}
+
+/* smoother dropdown appearance */
+.nav .dropdown { transition: opacity 0.2s ease; }
+.nav .nav-item:hover .dropdown { opacity: 1; }
