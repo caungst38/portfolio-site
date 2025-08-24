@@ -1,1 +1,161 @@
-<!-- index.html content for v68 baseline -->
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<title>Connyr Aungst — Cybersecurity Portfolio</title>
+<meta content="Hands-on cybersecurity projects with screenshots, write-ups, and downloadable PDFs." name="description"/>
+<link href="favicon.jpg" rel="icon"/>
+<link href="style.css?v=6.12" rel="stylesheet"/>
+<script defer="" src="app.js?v=6.12"></script>
+</head>
+<body>
+<header class="topbar">
+<div class="brand">
+<img alt="CA Logo" class="logo" src="assets/images/logo/ca.webp"/>
+<div class="name"><span><span class="brand-name">Connyr Aungst</span></span></div>
+</div>
+<nav class="nav">
+<div class="nav-item has-dropdown"><a href="#stats">Stats</a>
+<div class="dropdown">
+<a href="#stats">Overview</a>
+<a href="#stats">Top Countries</a>
+<a href="#stats">Rate Limited</a>
+</div>
+</div>
+<a class="nav-item" href="#about">About</a>
+<a class="nav-item" href="#certs">Certifications</a>
+<div class="nav-item has-dropdown"><a href="#general">General Projects</a>
+<div class="dropdown" id="generalMenu"></div>
+</div>
+<div class="nav-item has-dropdown"><a href="#security">Security Projects</a>
+<div class="dropdown" id="securityMenu"></div>
+</div>
+<div class="nav-item has-dropdown"><a href="#contact">Contact</a>
+<div class="dropdown">
+<a href="mailto:you@connyraungst.com" target="_blank">Email</a>
+<a href="https://www.linkedin.com/in/connyr-aungst" rel="noopener" target="_blank">LinkedIn</a>
+<a href="https://github.com/connyraungst" rel="noopener" target="_blank">GitHub</a>
+</div>
+</div>
+</nav>
+</header>
+<section class="hero center" id="hero">
+<div class="hero-inner center">
+<div class="hero-text">
+<h1>Cybersecurity Portfolio</h1>
+</div>
+<picture class="hero-headshot">
+<source srcset="assets/images/headshot.webp" type="image/webp"/>
+<img alt="Connyr Aungst headshot" loading="eager" src="assets/images/headshot.jpg"/>
+</picture>
+<div class="hero-text">
+<h2 class="hero-name">Connyr Aungst</h2>
+<p class="tagline">Blue/Red Team Ops – Cloud Security – Network Security – Incident Response</p>
+<div class="hero-links">
+<a class="btn" href="#general">View Projects</a>
+<a class="btn outline" href="#stats">Site Statistics</a>
+</div>
+</div>
+</div>
+</section>
+<section class="chipbar">
+<button class="chip" data-filter="All">All</button>
+<button class="chip" data-filter="Web">Web</button>
+<button class="chip" data-filter="Cloud">Cloud</button>
+<button class="chip" data-filter="Security — Offense">Security — Offense</button>
+<button class="chip" data-filter="Security — Defense">Security — Defense</button>
+<button class="chip" data-filter="Networking">Networking</button>
+<button class="chip" data-filter="Scripting">Scripting</button>
+<button class="chip" data-filter="Governance">Governance</button>
+<button class="chip" data-filter="Tooling/DevOps">Tooling/DevOps</button>
+<button class="chip" data-filter="Misc">Misc</button>
+</section>
+<main class="wrap">
+<section class="section" id="stats">
+<h2>Site Statistics</h2>
+<div class="cards">
+<article class="card">
+<h3>Browser</h3>
+<div id="uaInfo">—</div>
+<small>Your browser &amp; version</small>
+</article>
+<article class="card">
+<h3>Device</h3>
+<div id="deviceType">—</div>
+<small>Desktop / Laptop / Mobile</small>
+</article>
+<article class="card">
+<h3>HTTPS</h3>
+<div id="httpsState">—</div>
+<small>Encrypted connection</small>
+</article>
+<article class="card">
+<h3>Security Headers</h3>
+<div class="pill-list" id="secHeaders"></div>
+<small>Best‑practice HTTP headers</small>
+</article>
+<article class="card">
+<h3>Requests Served (7d)</h3>
+<div id="reqs7d">—</div>
+<small>Cloudflare totals</small>
+</article>
+<article class="card">
+<h3>Blocked (WAF, 7d)</h3>
+<div id="waf7d">—</div>
+<small>Firewall blocks</small>
+</article>
+<article class="card">
+<h3>Lighthouse</h3>
+<div id="lighthouseScores">Connect Netlify API</div>
+<small>Performance · Accessibility · Best Practices · SEO · PWA</small>
+</article>
+<article class="card">
+<h3>Top Countries (30d)</h3>
+<div id="topCountries">—</div>
+<small>Visitors by country</small>
+</article>
+</div>
+</section>
+<section class="section" id="about">
+<h2>About Me</h2>
+<div class="about-card" style="display:grid;grid-template-columns:auto 1fr;gap:clamp(6px,0.8vw,12px);align-items:start;">
+<picture class="about-photo" style="display:block;width:clamp(312px,36%,384px);aspect-ratio:7/6;max-height:clamp(284px,43vh,567px);overflow:hidden;border-radius:16px;margin:0;">
+<source srcset="assets/images/about-photo.webp 1x, assets/images/about-photo@2x.webp 2x" type="image/webp">
+<img alt="About photo" loading="lazy" src="assets/images/about-photo.png" style="display:block;width:100%;height:100%;object-fit:cover;object-position:50% 50%;">
+</img></source></picture>
+<div class="about-body">
+<p>Detail-oriented and driven aspiring IT professional with experience in systems administration and property/asset management in Healthcare and Real Estate settings, currently pursuing a B.S. in Cybersecurity. Skilled in network troubleshooting, system hardening, and risk assessment. Seeking to leverage hands-on IT experience and formal security training to support enterprise information security initiatives. Outside of my prior work history and passion for IT, Cybersecurity, and technology in general, I enjoy traveling domestically and abroad, staying active in the gym, playing ice hockey when I get the chance (although much less frequently than I did growing up), and spending time with family and friends in whatever ways I can.</p>
+</div>
+</div>
+</section>
+<section class="section" id="certs">
+<h2>Certifications</h2>
+<div class="grid" id="certifications"></div>
+</section>
+<section class="section" id="general">
+<h2>General Projects</h2>
+<div class="grid" id="projects-general"></div>
+<div class="error" id="projects-general-error"></div>
+</section>
+<section class="section" id="security">
+<h2>Security Projects</h2>
+<div class="grid" id="projects-security"></div>
+</section>
+<footer class="footer" id="contact">
+<p>© <span id="year"></span> Connyr Aungst · <a href="mailto:you@connyraungst.com">you@connyraungst.com</a> · <a href="https://www.linkedin.com/in/connyr-aungst" rel="noopener" target="_blank">LinkedIn</a> · <a href="https://github.com/connyraungst" rel="noopener" target="_blank">GitHub</a></p>
+</footer>
+</main>
+<div aria-hidden="true" class="lightbox" id="lightbox">
+<button aria-label="Close" class="lightbox-close">×</button>
+<img alt="Project screenshot" id="lightboxImage" src=""/>
+<div class="caption" id="lightboxCaption"></div>
+<div class="lb-actions">
+<a class="btn" hidden="" href="#" id="lightboxPdf" rel="noopener" target="_blank">Download Summary PDF</a>
+<a class="btn outline" hidden="" href="#" id="lightboxRepo" rel="noopener" target="_blank">View Code</a>
+</div>
+</div>
+<noscript>This site uses a little JavaScript to render cards and stats. Please enable JS.</noscript>
+</body>
+</html>

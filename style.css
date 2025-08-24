@@ -1,15 +1,16 @@
 /* style.css content for v68 baseline */
 
-/* ===== v6.9 Header/Nav Polish (safe append) ===== */
-.topbar { border-bottom: 2px solid rgba(0,230,216,.35); box-shadow: 0 2px 12px rgba(0,230,216,.15); padding-right: 10px; }
-.topbar .brand { display:flex; align-items:center; gap:14px; }
-.topbar .brand .logo { width:80px !important; height:auto; }
-.brand-name { font-size:2em !important; font-weight:700; text-shadow:var(--glow); line-height:1.2; }
-.topbar .nav { margin-left:auto; justify-content:flex-end; gap:9px; display:flex; align-items:center; }
-.topbar .nav .nav-item > a, .topbar .nav > a { font-size:0.9em; }
-.topbar .nav .nav-item > a.active, .topbar .nav > a.active {
-  border-bottom:2px solid var(--accent);
-  color:var(--accent) !important;
-  box-shadow:var(--glow);
+/* ===== v6.12 Header/Nav Polish (enforced) ===== */
+header.topbar { 
+  border-bottom: 2px solid rgba(0,230,216,.35) !important; 
+  box-shadow: 0 2px 12px rgba(0,230,216,.15) !important; 
+  padding-right: 10px !important; 
 }
-.nav .dropdown{ transition:opacity .2s ease; } .nav .nav-item:hover .dropdown{ opacity:1; }
+header.topbar .brand { display:flex !important; align-items:center !important; gap:14px !important; }
+header.topbar .brand .logo { width:80px !important; height:auto !important; }
+header.topbar .brand .brand-name { font-size:2em !important; font-weight:700 !important; text-shadow:var(--glow) !important; line-height:1.2 !important; }
+header.topbar .nav { margin-left:auto !important; justify-content:flex-end !important; gap:9px !important; display:flex !important; align-items:center !important; }
+header.topbar .nav .nav-item > a, 
+header.topbar .nav a { font-size:0.9em !important; color: var(--accent) !important; border-bottom:2px solid transparent !important; }
+header.topbar .nav .nav-item > a.active, 
+header.topbar .nav a.active { border-bottom:2px solid var(--accent) !important; color: var(--accent) !important; box-shadow: var(--glow) !important; }
