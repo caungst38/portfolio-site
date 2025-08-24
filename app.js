@@ -1,8 +1,9 @@
 // app.js content for v68 baseline
-/* v6.10: Active nav highlight by section */
+
+/* ===== v69: Active nav highlight by section (safe append) ===== */
 (function(){
   try{
-    const navLinks = Array.from(document.querySelectorAll('.topbar .nav .nav-item > a[href^="#"]'));
+    const navLinks = Array.from(document.querySelectorAll('.topbar .nav .nav-item > a[href^="#"], .topbar .nav > a[href^="#"]'));
     const byHash = new Map(navLinks.map(a => [a.getAttribute('href'), a]));
     const targets = navLinks.map(a => a.getAttribute('href')).filter(h => h && h.startsWith('#')).map(h => document.querySelector(h)).filter(Boolean);
     function setActive(idHash){
